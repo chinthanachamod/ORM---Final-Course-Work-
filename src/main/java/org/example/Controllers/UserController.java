@@ -10,7 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import org.example.BO.Impl.BOFactory;
+import org.example.BO.BOFactory;
 import org.example.BO.Impl.UserBOImpl;
 import org.example.BO.UserBO;
 import org.example.DTO.UserDTO;
@@ -78,11 +78,12 @@ public class UserController {
     @FXML
     private TextField txtPhone;
 
-    UserBO userBO = (UserBOImpl) BOFactory.getBoFactory().getBo(BOFactory.BoType.User);
+UserBO userBO = (UserBOImpl) BOFactory.getBoFactory().getBo(BOFactory.BoType.User);
 
-    public void initialize(){
+    public void initialize() throws SQLException, ClassNotFoundException {
         setCellValueFactory();
         loadAll();
+        generateNextUserId();
 
         tblUsers.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
@@ -95,6 +96,11 @@ public class UserController {
                 txtPassword.setText(newSelection.getPassword());
             }
         });
+    }
+    private void generateNextUserId() throws SQLException, ClassNotFoundException {
+        String code = userBO.generateNextId();
+        UserID.setText(code);
+
     }
 
     private void setCellValueFactory() {
@@ -113,7 +119,7 @@ public class UserController {
             List<UserDTO> userDTOList = userBO.getAll();
             for (UserDTO userDTO : userDTOList) {
                 UserDTO tm = new UserDTO(
-                        userDTO.getUser_id(),
+                       userDTO.getUser_id(),
                         userDTO.getUsername(),
                         userDTO.getAddress(),
                         userDTO.getUser_phone(),
@@ -166,7 +172,6 @@ public class UserController {
         } catch (Exception e) {
 
             new Alert(Alert.AlertType.ERROR, "An error occurred: " + e.getMessage()).show();
-            e.printStackTrace();
         }
     }
 
@@ -187,13 +192,13 @@ public class UserController {
     }
 
     @FXML
-    void btnClearOnAction(ActionEvent event) {
-        clear();
+    void btnClearOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
+    clear();
 
     }
 
-    private void clear() {
-        UserID.clear();
+    private void clear() throws SQLException, ClassNotFoundException {
+        generateNextUserId();
         txtName.clear();
         txtAddress.clear();
         txtPhone.clear();

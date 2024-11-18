@@ -1,6 +1,6 @@
-package org.example.BO.Impl;
+package org.example.BO;
 
-import org.example.BO.SuperBO;
+import org.example.BO.Impl.*;
 
 public class BOFactory {
     private static BOFactory boFactory;

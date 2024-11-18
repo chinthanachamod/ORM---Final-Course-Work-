@@ -1,6 +1,7 @@
 package org.example.BO;
 
 import org.example.DTO.UserDTO;
+import org.example.Entity.User;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -14,6 +15,8 @@ public interface UserBO extends SuperBO {
 
     public List<UserDTO> getAll() throws SQLException, ClassNotFoundException;
 
-    UserDTO searchByIdCustomer(String id) throws SQLException, ClassNotFoundException;
+    User searchByIdUser(String id) throws SQLException, ClassNotFoundException;
 
+    public String generateNextId() throws SQLException, ClassNotFoundException;
+    public List<String> getUserIds();
 }

@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
 public class DashBoardController {
+
     @FXML
     private Button btnCourse;
     @FXML
@@ -22,6 +23,9 @@ public class DashBoardController {
     @FXML
     private Button btnUsers;
 
+    public void initialize(){
+
+    }
     @FXML
     void btnCourseOnAction(ActionEvent event) {
         try {
@@ -81,7 +85,7 @@ public class DashBoardController {
     @FXML
     void btnStudentRegisterOnAction(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/StudentRegisteration.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Student_Course.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) btnStudentRegister.getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -105,4 +109,9 @@ public class DashBoardController {
             e.printStackTrace();
         }
     }
+/*    public void setUserId(String userId) throws Exception {
+        StudentController studentController = new StudentController();
+        studentController.lblUserID(userId);
+    }*/
+
 }

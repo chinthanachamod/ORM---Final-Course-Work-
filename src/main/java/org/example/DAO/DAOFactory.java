@@ -1,6 +1,6 @@
 package org.example.DAO;
 
-import org.example.DAO.Impl.*;
+import org.example.DAO.Impl.Custom.*;
 
 public class DAOFactory {
     private static DAOFactory daoFactory;

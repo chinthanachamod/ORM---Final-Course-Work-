@@ -2,7 +2,7 @@ package org.example.BO.Impl;
 
 import org.example.BO.UserBO;
 import org.example.DAO.DAOFactory;
-import org.example.DAO.UserDAO;
+import org.example.DAO.Impl.UserDAO;
 import org.example.DTO.UserDTO;
 import org.example.Entity.User;
 
@@ -38,7 +38,17 @@ public class UserBOImpl implements UserBO {
     }
 
     @Override
-    public UserDTO searchByIdCustomer(String id) throws SQLException, ClassNotFoundException {
-        return null;
+    public User searchByIdUser(String id) throws SQLException, ClassNotFoundException {
+        return userDAO.searchByID(id);
+    }
+
+    @Override
+    public String generateNextId() throws SQLException, ClassNotFoundException {
+        return userDAO.generateNextId();
+    }
+
+    @Override
+    public List<String> getUserIds() {
+        return userDAO.getUserIds();
     }
 }

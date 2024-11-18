@@ -24,4 +24,8 @@ public class Student {
 
     @ManyToOne
     private User user;
+
+
+
+
 }
