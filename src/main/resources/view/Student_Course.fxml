@@ -63,20 +63,20 @@
     <!-- Table View for Student Course Information -->
     <TableView fx:id="tblStudentCourse" layoutX="28.0" layoutY="377.0" prefHeight="200.0" prefWidth="938.0">
         <columns>
-            <TableColumn fx:id="colStudentId" prefWidth="237.59995651245117" text="Student ID" />
-            <TableColumn fx:id="colDate" prefWidth="232.00006103515625" text="Date" />
-            <TableColumn fx:id="colStudentCourseId" prefWidth="217.60003662109375" text="Student Course ID" />
-            <TableColumn fx:id="colCourseId" prefWidth="277.59991455078125" text="Course ID" />
+            <TableColumn fx:id="colStudentId" prefWidth="279.0" text="Student ID" />
+            <TableColumn fx:id="colCourseId" prefWidth="288.0" text="Course ID" />
+            <TableColumn fx:id="colDate" prefWidth="190.0" text="Date" />
+            <TableColumn fx:id="colStudentCourseId" prefWidth="207.0" text="Student Course ID" />
         </columns>
     </TableView>
-   <Label fx:id="lblStudentName1" layoutX="166.0" layoutY="165.0" prefHeight="26.0" prefWidth="146.0" style="-fx-border-color: white;" />
-   <Label fx:id="lblStudentID" layoutX="474.0" layoutY="165.0" prefHeight="26.0" prefWidth="146.0" style="-fx-border-color: white;" />
-   <Label fx:id="lblCourseID" layoutX="166.0" layoutY="214.0" prefHeight="26.0" prefWidth="146.0" style="-fx-border-color: white;" />
-   <Label fx:id="lblFee1" layoutX="474.0" layoutY="214.0" prefHeight="26.0" prefWidth="146.0" style="-fx-border-color: white;" />
-   <Label fx:id="lblPaymentId1" layoutX="474.0" layoutY="263.0" prefHeight="26.0" prefWidth="146.0" style="-fx-border-color: white;" />
-   <Label fx:id="lblDate1" layoutX="165.0" layoutY="315.0" prefHeight="26.0" prefWidth="146.0" style="-fx-border-color: white;" />
-   <Label fx:id="lblStudentCourseId1" layoutX="474.0" layoutY="315.0" prefHeight="26.0" prefWidth="146.0" style="-fx-border-color: white;" />
-   <Label layoutX="308.0" layoutY="24.0" text="Student Register">
+    <Label fx:id="lblStudentName1" layoutX="166.0" layoutY="80.0" />
+    <Label fx:id="lblStudentID" layoutX="166.0" layoutY="110.0" />
+    <Label fx:id="lblCourseID" layoutX="166.0" layoutY="140.0" />
+    <Label fx:id="lblFee1" layoutX="166.0" layoutY="170.0" />
+    <Label fx:id="lblPaymentId1" layoutX="166.0" layoutY="227.0" />
+    <Label fx:id="lblDate1" layoutX="166.0" layoutY="256.0" />
+    <Label fx:id="lblStudentCourseId1" layoutX="166.0" layoutY="284.0" />
+    <Label layoutX="638.0" layoutY="26.0" text="Student Register">
       <font>
          <Font name="System Bold" size="34.0" />
       </font>

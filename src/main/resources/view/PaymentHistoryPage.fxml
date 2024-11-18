@@ -11,11 +11,10 @@
     <children>
         <TableView fx:id="tblPaymentHistory" layoutX="23.0" layoutY="126.0" prefHeight="386.0" prefWidth="845.0">
             <columns>
-                <TableColumn fx:id="colPayID" prefWidth="111.20000839233398" text="ID" />
-                <TableColumn fx:id="colStudentId" prefWidth="150.4000244140625" text="Student Id" />
-                <TableColumn fx:id="colCourseName" prefWidth="210.39996337890625" text="Course Name" />
-                <TableColumn fx:id="colDate" prefWidth="187.20004272460938" text="Date" />
-                <TableColumn fx:id="colFee" prefWidth="186.4000244140625" text="Course Fee" />
+                <TableColumn fx:id="colPayID" prefWidth="101.0" text="ID" />
+                <TableColumn fx:id="colStudent_courseID" prefWidth="148.0" text="Student_Course ID" />
+                <TableColumn fx:id="colDate" prefWidth="198.0" text="Date" />
+                <TableColumn fx:id="colFee" prefWidth="176.0" text="Course Fee" />
             </columns>
         </TableView>
         <Label layoutX="258.0" layoutY="34.0" prefHeight="50.0" prefWidth="318.0" text="- Payment History -">
