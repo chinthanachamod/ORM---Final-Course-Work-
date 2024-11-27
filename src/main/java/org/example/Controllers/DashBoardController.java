@@ -37,7 +37,6 @@ public class DashBoardController {
 
     private void lastLoginID() {
         Login login = loginDAO.getLastLogin();
-        System.out.println(login.getUserID());
         LblUserID.setText(login.getUserID());
     }
 
