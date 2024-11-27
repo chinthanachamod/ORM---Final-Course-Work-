@@ -79,15 +79,15 @@
       <font>
          <Font name="System Bold" size="15.0" />
       </font></Button>
-    <Button fx:id="btnUpdate" layoutX="19.0" layoutY="494.0" onAction="#btnUpdateOnAction" prefHeight="26.0" prefWidth="74.0" style="-fx-background-color: #FF9800; -fx-text-fill: white;" text="Update">
+    <Button fx:id="btnUpdate" layoutX="19.0" layoutY="490.0" onAction="#btnUpdateOnAction" prefHeight="31.0" prefWidth="74.0" style="-fx-background-color: #FF9800; -fx-text-fill: white;" text="Update">
       <font>
          <Font name="System Bold" size="13.0" />
       </font></Button>
-    <Button fx:id="btnDelete" layoutX="112.0" layoutY="494.0" onAction="#btnDeleteOnAction" prefHeight="26.0" prefWidth="74.0" style="-fx-background-color: #f44336; -fx-text-fill: white;" text="Delete">
+    <Button fx:id="btnDelete" layoutX="112.0" layoutY="490.0" onAction="#btnDeleteOnAction" prefHeight="31.0" prefWidth="74.0" style="-fx-background-color: #f44336; -fx-text-fill: white;" text="Delete">
       <font>
          <Font name="System Bold" size="13.0" />
       </font></Button>
-    <Button fx:id="btnClear" layoutX="205.0" layoutY="494.0" onAction="#btnClearOnAction" prefHeight="26.0" prefWidth="74.0" style="-fx-background-color: #607D8B; -fx-text-fill: white;" text="Clear">
+    <Button fx:id="btnClear" layoutX="205.0" layoutY="490.0" onAction="#btnClearOnAction" prefHeight="31.0" prefWidth="74.0" style="-fx-background-color: #607D8B; -fx-text-fill: white;" text="Clear">
       <font>
          <Font name="System Bold" size="13.0" />
       </font></Button>
