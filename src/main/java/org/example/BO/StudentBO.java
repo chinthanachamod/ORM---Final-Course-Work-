@@ -6,7 +6,7 @@ import org.example.Entity.Student;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface StudentBO {
+public interface StudentBO extends SuperBO {
     public boolean save(StudentDTO dto) throws Exception;
 
     public boolean update(StudentDTO dto) throws Exception;

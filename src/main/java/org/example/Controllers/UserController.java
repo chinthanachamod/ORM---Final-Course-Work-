@@ -9,13 +9,19 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import org.example.BO.BOFactory;
 import org.example.BO.Impl.UserBOImpl;
 import org.example.BO.UserBO;
+import org.example.DAO.DAOFactory;
+import org.example.DAO.Impl.LoginDAO;
 import org.example.DTO.UserDTO;
+import org.example.Entity.Login;
+import org.example.Entity.User;
 import org.example.util.PasswordEncrypt;
 import org.example.util.PasswordVerifier;
+import org.example.util.Regex.Regex;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -78,12 +84,14 @@ public class UserController {
     @FXML
     private TextField txtPhone;
 
-UserBO userBO = (UserBOImpl) BOFactory.getBoFactory().getBo(BOFactory.BoType.User);
+    UserBO userBO = (UserBOImpl) BOFactory.getBoFactory().getBo(BOFactory.BoType.User);
+    LoginDAO loginDAO = (LoginDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DaoType.Login);
 
     public void initialize() throws SQLException, ClassNotFoundException {
         setCellValueFactory();
         loadAll();
         generateNextUserId();
+        lastLoginID();
 
         tblUsers.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
@@ -97,6 +105,33 @@ UserBO userBO = (UserBOImpl) BOFactory.getBoFactory().getBo(BOFactory.BoType.Use
             }
         });
     }
+    /*login table eke log una last kenage user id ek aragannw*/
+    private void lastLoginID() throws SQLException, ClassNotFoundException {
+        Login login = loginDAO.getLastLogin();
+        UserID(login.getUserID());
+
+    }
+    /*Access denn security ekak danamw*/
+    public void UserID(String ID) throws SQLException, ClassNotFoundException {
+        User user = userBO.searchByIdUser(ID);
+        String position = user.getPosition();
+
+        if ("Admin".equals(position)) {
+            btnBack.setDisable(false);
+            btnClear.setDisable(false);
+            btnAdd.setDisable(true);
+            btnUpdate.setDisable(true);
+            btnDelete.setDisable(true);
+        } else if ("Admissions Coordinator".equals(position)) {
+            btnAdd.setDisable(false);
+            btnUpdate.setDisable(false);
+            btnDelete.setDisable(false);
+            btnBack.setDisable(false);
+            btnClear.setDisable(false);
+        }
+    }
+
+
     private void generateNextUserId() throws SQLException, ClassNotFoundException {
         String code = userBO.generateNextId();
         UserID.setText(code);
@@ -113,13 +148,14 @@ UserBO userBO = (UserBOImpl) BOFactory.getBoFactory().getBo(BOFactory.BoType.Use
 
     }
 
+
     private void loadAll() {
         ObservableList<UserDTO> obList = FXCollections.observableArrayList();
         try {
             List<UserDTO> userDTOList = userBO.getAll();
             for (UserDTO userDTO : userDTOList) {
                 UserDTO tm = new UserDTO(
-                       userDTO.getUser_id(),
+                        userDTO.getUser_id(),
                         userDTO.getUsername(),
                         userDTO.getAddress(),
                         userDTO.getUser_phone(),
@@ -152,23 +188,25 @@ UserBO userBO = (UserBOImpl) BOFactory.getBoFactory().getBo(BOFactory.BoType.Use
 
             String encryptedPassword = PasswordEncrypt.hashPassword(password);
 
+            if (isValied()) {
+                if (PasswordVerifier.verifyPassword(password, encryptedPassword)) {
+                    UserDTO userDTO = new UserDTO(id, name, address, phone, email, position, encryptedPassword);
 
-            if (PasswordVerifier.verifyPassword(password, encryptedPassword)) {
-                UserDTO userDTO = new UserDTO(id, name, address, phone, email, position, encryptedPassword);
 
-
-                boolean isSaved = userBO.save(userDTO);
-                if (isSaved) {
-                    new Alert(Alert.AlertType.CONFIRMATION, "User saved successfully!").show();
-                    clear();
-                    loadAll();
-
+                    boolean isSaved = userBO.save(userDTO);
+                    if (isSaved) {
+                        new Alert(Alert.AlertType.CONFIRMATION, "User saved successfully!").show();
+                        clear();
+                        loadAll();
+                    }
                 } else {
                     new Alert(Alert.AlertType.ERROR, "User not saved successfully!").show();
                 }
             } else {
                 new Alert(Alert.AlertType.ERROR, "Password verification failed!").show();
+
             }
+
         } catch (Exception e) {
 
             new Alert(Alert.AlertType.ERROR, "An error occurred: " + e.getMessage()).show();
@@ -193,7 +231,7 @@ UserBO userBO = (UserBOImpl) BOFactory.getBoFactory().getBo(BOFactory.BoType.Use
 
     @FXML
     void btnClearOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
-    clear();
+        clear();
 
     }
 
@@ -237,18 +275,18 @@ UserBO userBO = (UserBOImpl) BOFactory.getBoFactory().getBo(BOFactory.BoType.Use
             String password = txtPassword.getText();
 
             String encryptedPassword = PasswordEncrypt.hashPassword(password);
+            if (isValied()) {
+                if (PasswordVerifier.verifyPassword(password, encryptedPassword)) {
+                    UserDTO userDTO = new UserDTO(id, name, address, phone, email, position, encryptedPassword);
 
 
-            if (PasswordVerifier.verifyPassword(password, encryptedPassword)) {
-                UserDTO userDTO = new UserDTO(id, name, address, phone, email, position, encryptedPassword);
+                    boolean isUpdate = userBO.update(userDTO);
+                    if (isUpdate) {
+                        new Alert(Alert.AlertType.CONFIRMATION, "User Update successfully!").show();
+                        clear();
+                        loadAll();
 
-
-                boolean isUpdate = userBO.update(userDTO);
-                if (isUpdate) {
-                    new Alert(Alert.AlertType.CONFIRMATION, "User Update successfully!").show();
-                    clear();
-                    loadAll();
-
+                    }
                 } else {
                     new Alert(Alert.AlertType.ERROR, "User not Update successfully!").show();
                 }
@@ -264,5 +302,42 @@ UserBO userBO = (UserBOImpl) BOFactory.getBoFactory().getBo(BOFactory.BoType.Use
 
     @FXML
     void cmbPositionOnAction(ActionEvent actionEvent) {
+    }
+
+
+    public boolean isValied() {
+        if (!Regex.setTextColor(org.example.util.Regex.TextField.NAME, txtName)) return false;
+        if (!Regex.setTextColor(org.example.util.Regex.TextField.ADDRESS, txtAddress)) return false;
+        if (!Regex.setTextColor(org.example.util.Regex.TextField.EMAIL, txtEmail)) return false;
+        if (!Regex.setTextColor(org.example.util.Regex.TextField.CONTACT, txtPhone)) return false;
+
+        return true;
+    }
+
+    @FXML
+    void Address(KeyEvent event) {
+        Regex.setTextColor(org.example.util.Regex.TextField.ADDRESS, txtAddress);
+
+    }
+
+    @FXML
+    void Email(KeyEvent event) {
+        Regex.setTextColor(org.example.util.Regex.TextField.EMAIL, txtEmail);
+
+    }
+
+    @FXML
+    void Name(KeyEvent event) {
+        Regex.setTextColor(org.example.util.Regex.TextField.NAME, txtName);
+    }
+
+    @FXML
+    void Password(KeyEvent event) {
+
+    }
+
+    @FXML
+    void Phone(KeyEvent event) {
+        Regex.setTextColor(org.example.util.Regex.TextField.CONTACT, txtPhone);
     }
 }

@@ -1,12 +1,13 @@
 package org.example.BO;
 
 import org.example.DTO.CourseDTO;
+import org.example.DTO.UserDTO;
 import org.example.Entity.Course;
 
 import java.sql.SQLException;
 import java.util.List;
 
-public interface CourseBO {
+public interface CourseBO extends SuperBO{
 
     public boolean save(CourseDTO dto) throws Exception;
 

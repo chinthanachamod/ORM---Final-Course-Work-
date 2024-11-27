@@ -6,7 +6,7 @@ import org.example.Entity.Payment;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface PaymentBO {
+public interface PaymentBO extends SuperBO {
     public boolean save(PaymentDTO dto) throws Exception;
 
     public boolean update(PaymentDTO dto) throws Exception;

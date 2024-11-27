@@ -133,5 +133,6 @@ public class StudentDAOImpl implements StudentDAO {
                 .uniqueResult();
         transaction.commit();
         session.close();
-        return student;    }
+        return student;
+    }
 }

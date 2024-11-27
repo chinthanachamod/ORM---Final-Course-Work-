@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserBOImpl implements UserBO {
-  UserDAO userDAO = (UserDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DaoType.User);
+    UserDAO userDAO = (UserDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DaoType.User);
     @Override
     public boolean save(UserDTO dto) throws Exception {
         return userDAO.save(new User(dto.getUser_id(),dto.getUsername(),dto.getAddress(),dto.getUser_phone(),dto.getUser_email(),dto.getPosition(),dto.getPassword()));
@@ -24,7 +24,7 @@ public class UserBOImpl implements UserBO {
 
     @Override
     public boolean delete(String ID) throws Exception {
-       return userDAO.delete(ID);
+        return userDAO.delete(ID);
     }
 
     @Override

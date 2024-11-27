@@ -1,5 +1,6 @@
 package org.example.Controllers;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -12,10 +13,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import org.example.BO.*;
 import org.example.BO.Impl.StudentRegisterBOImpl;
+import org.example.BO.Impl.UserBOImpl;
+import org.example.DAO.DAOFactory;
+import org.example.DAO.Impl.LoginDAO;
 import org.example.DTO.*;
-import org.example.Entity.Course;
-import org.example.Entity.Payment;
-import org.example.Entity.Student;
+import org.example.Entity.*;
 
 import java.sql.Date;
 import java.sql.SQLException;
@@ -47,31 +49,16 @@ public class StudentRegisterController {
     private ComboBox<String> cmbStudentPhoneNumber;
 
     @FXML
-    private TableColumn<?, ?> colCourseId;
-
-    @FXML
-    private TableColumn<?, ?> colCourseName;
+    private TableColumn<Student_CourseDTO, String> colCourseId;
 
     @FXML
     private TableColumn<?, ?> colDate;
 
     @FXML
-    private TableColumn<?, ?> colFee;
-
-    @FXML
-    private TableColumn<?, ?> colPaymentId;
-
-    @FXML
-    private TableColumn<?, ?> colPhone;
-
-    @FXML
     private TableColumn<?, ?> colStudentCourseId;
 
     @FXML
-    private TableColumn<?, ?> colStudentId;
-
-    @FXML
-    private TableColumn<?, ?> colStudentName;
+    private TableColumn<Student_CourseDTO, String> colStudentId;
 
     @FXML
     private Label lblCourseID;
@@ -101,6 +88,8 @@ public class StudentRegisterController {
     StudentBO studentBO = (StudentBO) BOFactory.getBoFactory().getBo(BOFactory.BoType.Student);
     PaymentBO paymentBO = (PaymentBO) BOFactory.getBoFactory().getBo(BOFactory.BoType.Payment);
     Student_CourseBO studentCourseBO = (Student_CourseBO) BOFactory.getBoFactory().getBo(BOFactory.BoType.Student_Course);
+    UserBO userBO = (UserBOImpl) BOFactory.getBoFactory().getBo(BOFactory.BoType.User);
+    LoginDAO loginDAO = (LoginDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DaoType.Login);
 
     public void initialize() throws SQLException, ClassNotFoundException {
         LoadAllData();
@@ -109,6 +98,7 @@ public class StudentRegisterController {
         getStudentIds();
         generateNextId();
         LocalDate();
+        lastLoginID();
 
         tblStudentCourse.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
@@ -137,6 +127,7 @@ public class StudentRegisterController {
         });
 
     }
+
     private void LoadAllData() {
         ObservableList<Student_CourseDTO> obList = FXCollections.observableArrayList();
         try {
@@ -166,11 +157,49 @@ public class StudentRegisterController {
         }
     }
 
+    /*login table eke log una last kenage user id ek aragannw*/
+    private void lastLoginID() throws SQLException, ClassNotFoundException {
+        Login login = loginDAO.getLastLogin();
+        UserID(login.getUserID());
+
+    }
+
+    /*Access denn security ekak danamw*/
+    public void UserID(String ID) throws SQLException, ClassNotFoundException {
+        String UserID = ID;
+        User user = userBO.searchByIdUser(UserID);
+        String position = user.getPosition();
+
+        if (position.equals("Admin")) {
+            btnBack.setDisable(false);
+            btnClear.setDisable(false);
+            btnAdd.setDisable(true);
+            btnUpdate.setDisable(true);
+            btnDelete.setDisable(true);
+
+        } else if (position.equals("Admissions Coordinator")) {
+            btnAdd.setDisable(false);
+            btnUpdate.setDisable(false);
+            btnDelete.setDisable(false);
+            btnBack.setDisable(false);
+            btnClear.setDisable(false);
+        }
+    }
 
     private void SetCellValue() {
         colStudentCourseId.setCellValueFactory(new PropertyValueFactory<>("student_course_id"));
-        colStudentId.setCellValueFactory(new PropertyValueFactory<>("student"));
-        colCourseId.setCellValueFactory(new PropertyValueFactory<>("course"));
+        colStudentId.setCellValueFactory(cellData -> {
+            Student_CourseDTO sc = cellData.getValue();
+            return new SimpleStringProperty(
+                    sc.getStudent() != null ? sc.getStudent().getStu_id() : "N/A"
+            );
+        });
+        colCourseId.setCellValueFactory(cellData -> {
+            Student_CourseDTO sc = cellData.getValue();
+            return new SimpleStringProperty(
+                    sc.getCourse() != null ? sc.getCourse().getCourse_name() : "N/A"
+            );
+        });
         colDate.setCellValueFactory(new PropertyValueFactory<>("registration_date"));
     }
 
@@ -234,6 +263,7 @@ public class StudentRegisterController {
 
         boolean isRegister = StudentRegisterBOImpl.StudentRegisterPlace(studentRegisterPlaceDTO);
         if (isRegister) {
+            LoadAllData();
             clear();
             new Alert(Alert.AlertType.CONFIRMATION, "Successfully Registered").show();
         } else {
@@ -259,20 +289,84 @@ public class StudentRegisterController {
 
     @FXML
     void btnDeleteOnAction(ActionEvent event) {
-
+        String S_id = lblStudentCourseId1.getText();
+        try {
+            boolean isDeleted = studentCourseBO.delete(S_id);
+            if (isDeleted) {
+                new Alert(Alert.AlertType.CONFIRMATION, "deleted successfully!").show();
+                clear();
+                LoadAllData();
+            } else {
+                new Alert(Alert.AlertType.ERROR, "Failed to delete!").show();
+            }
+        } catch (Exception e) {
+            new Alert(Alert.AlertType.ERROR, "An error occurred: " + e.getMessage()).show();
+        }
     }
 
     @FXML
-    void btnUpdateOnAction(ActionEvent event) {
+    void btnUpdateOnAction(ActionEvent event) throws Exception {
+        String contact = cmbStudentPhoneNumber.getValue();
+        String CourseID = lblCourseID.getText();
 
+
+        Student studentDTO = studentBO.searchByContact(contact);
+        if (studentDTO == null) {
+            new Alert(Alert.AlertType.WARNING, "Student not found!").show();
+            return;
+        }
+        StudentDTO student = new StudentDTO(
+                studentDTO.getStu_id(),
+                studentDTO.getStu_name(),
+                studentDTO.getStu_phone(),
+                studentDTO.getStu_email(),
+                studentDTO.getStu_address(),
+                new UserDTO()
+        );
+
+
+        Course courseDTO = courseBO.searchById(CourseID);
+        if (courseDTO == null) {
+            new Alert(Alert.AlertType.WARNING, "Course not found!").show();
+            return;
+        }
+        CourseDTO course = new CourseDTO(
+                courseDTO.getCourse_id(),
+                courseDTO.getCourse_name(),
+                courseDTO.getDuration(),
+                courseDTO.getCourse_fee()
+        );
+
+        String Student_courseID = lblStudentCourseId1.getText();
+        String PaymentID = lblPaymentId1.getText();
+        double Fee = Double.parseDouble(lblFee1.getText());
+        Date date = Date.valueOf(lblDate1.getText());
+
+        Student_CourseDTO studentCourseDTO = new Student_CourseDTO(Student_courseID, student, course, date);
+        PaymentDTO paymentDTO = new PaymentDTO(PaymentID, date, Fee, studentCourseDTO);
+
+/*
+        StudentRegisterPlaceDTO studentRegisterPlaceDTO = new StudentRegisterPlaceDTO(studentCourseDTO, paymentDTO);
+*/
+
+        boolean isUpdate = paymentBO.update(paymentDTO);
+        boolean isUpdate_SC = studentCourseBO.update(studentCourseDTO);
+        if (isUpdate && isUpdate_SC) {
+            clear();
+            LoadAllData();
+            new Alert(Alert.AlertType.CONFIRMATION, "Successfully Update").show();
+        } else {
+            new Alert(Alert.AlertType.WARNING, "Unsuccessful! Update").show();
+        }
     }
+
 
     @FXML
     void cmbCourseOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         String CourseName = cmbCourseName.getValue();
         try {
             Course course = courseBO.searchByName(CourseName);
-            if (course != null){
+            if (course != null) {
                 lblCourseID.setText(course.getCourse_id());
                 lblFee1.setText(String.valueOf(course.getCourse_fee()));
                 lblDuration.setText(course.getDuration());
@@ -291,7 +385,7 @@ public class StudentRegisterController {
         String StudentContct = cmbStudentPhoneNumber.getValue();
         try {
             Student student = studentBO.searchByContact(StudentContct);
-            if (student != null){
+            if (student != null) {
                 lblStudentID.setText(student.getStu_id());
                 lblStudentName1.setText(student.getStu_name());
 
@@ -302,6 +396,7 @@ public class StudentRegisterController {
             throw new RuntimeException(e);
         }
     }
+
     private void getCourseIds() throws ClassNotFoundException {
         ObservableList<String> obList = FXCollections.observableArrayList();
         try {
@@ -315,6 +410,7 @@ public class StudentRegisterController {
             throw new RuntimeException(e);
         }
     }
+
     private void getStudentIds() throws ClassNotFoundException {
         ObservableList<String> obList = FXCollections.observableArrayList();
         try {

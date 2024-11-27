@@ -1,5 +1,6 @@
 package org.example.Controllers;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -9,17 +10,22 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import org.example.BO.BOFactory;
 import org.example.BO.Impl.UserBOImpl;
 import org.example.BO.StudentBO;
 import org.example.BO.UserBO;
 import org.example.DAO.DAOFactory;
+import org.example.DAO.Impl.LoginDAO;
 import org.example.DAO.Impl.StudentDAO;
 import org.example.DAO.Impl.UserDAO;
 import org.example.DTO.StudentDTO;
 import org.example.DTO.UserDTO;
+import org.example.Entity.Login;
 import org.example.Entity.User;
+import javafx.scene.input.KeyEvent;
+import org.example.util.Regex.Regex;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -28,7 +34,7 @@ public class StudentController {
     @FXML
     private ComboBox cmbUser;
     @FXML
-    private TableColumn colUserID;
+    private TableColumn <StudentDTO,String> colUserID;
     @FXML
     private Button btnAdd;
 
@@ -82,13 +88,16 @@ public class StudentController {
     UserBO userBO = (UserBOImpl) BOFactory.getBoFactory().getBo(BOFactory.BoType.User);
     UserDAO userDAO = (UserDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DaoType.User);
     StudentDAO studentDAO = (StudentDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DaoType.Student);
+    LoginDAO loginDAO = (LoginDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DaoType.Login);
 
     public void initialize() throws SQLException, ClassNotFoundException {
         setCellValueFactory();
         loadAll();
         generateNextId();
         getIds();
-       /* lblUserID(id);*/
+        lastLoginID();
+
+        /* lblUserID(id);*/
 
 
         tblStudents.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -103,7 +112,33 @@ public class StudentController {
         });
     }
 
+    /*login table eke log una last kenage user id ek aragannw*/
+    private void lastLoginID() throws SQLException, ClassNotFoundException {
+        Login login = loginDAO.getLastLogin();
+        UserID(login.getUserID());
 
+    }
+    /*Access denn security ekak danamw*/
+    public void UserID(String ID) throws SQLException, ClassNotFoundException {
+        String UserID = ID;
+        User user = userBO.searchByIdUser(UserID);
+        String position = user.getPosition();
+
+        if (position.equals("Admin")) {
+            btnBack.setDisable(false);
+            btnClear.setDisable(false);
+            btnAdd.setDisable(true);
+            btnUpdate.setDisable(true);
+            btnDelete.setDisable(true);
+
+        } else if (position.equals("Admissions Coordinator")) {
+            btnAdd.setDisable(false);
+            btnUpdate.setDisable(false);
+            btnDelete.setDisable(false);
+            btnBack.setDisable(false);
+            btnClear.setDisable(false);
+        }
+    }
     private void generateNextId() throws SQLException, ClassNotFoundException {
         String code = studentBO.generateNextId();
         lblStudentID.setText(code);
@@ -120,14 +155,16 @@ public class StudentController {
                         studentDTO.getStu_phone(),
                         studentDTO.getStu_email(),
                         studentDTO.getStu_address(),
-                         new UserDTO( studentDTO.getUser().getUser_id(),
-                                 studentDTO.getUser().getUsername(),
-                                 studentDTO.getUser().getAddress(),
-                                 studentDTO.getUser().getUser_phone(),
-                                 studentDTO.getUser().getUser_email(),
-                                 studentDTO.getUser().getPosition(),
-                                 studentDTO.getUser().getPassword())
+                        new UserDTO(
+                                studentDTO.getUser().getUser_id(),
+                                studentDTO.getUser().getUsername(),
+                                studentDTO.getUser().getAddress(),
+                                studentDTO.getUser().getUser_phone(),
+                                studentDTO.getUser().getUser_email(),
+                                studentDTO.getUser().getPosition(),
+                                studentDTO.getUser().getPassword())
                 );
+
 
                 obList.add(tm);
             }
@@ -141,44 +178,55 @@ public class StudentController {
     }
 
     private void setCellValueFactory() {
-colAddress.setCellValueFactory(new PropertyValueFactory<>("stu_address"));
-colEmail.setCellValueFactory(new PropertyValueFactory<>("stu_email"));
-colName.setCellValueFactory(new PropertyValueFactory<>("stu_name"));
-colPhoneNumber.setCellValueFactory(new PropertyValueFactory<>("stu_phone"));
-colStudentID.setCellValueFactory(new PropertyValueFactory<>("stu_id"));
-colUserID.setCellValueFactory(new PropertyValueFactory<>("user"));
+        colAddress.setCellValueFactory(new PropertyValueFactory<>("stu_address"));
+        colEmail.setCellValueFactory(new PropertyValueFactory<>("stu_email"));
+        colName.setCellValueFactory(new PropertyValueFactory<>("stu_name"));
+        colPhoneNumber.setCellValueFactory(new PropertyValueFactory<>("stu_phone"));
+        colStudentID.setCellValueFactory(new PropertyValueFactory<>("stu_id"));
+
+        colUserID.setCellValueFactory(cellData -> {
+            StudentDTO student = cellData.getValue();
+            return new SimpleStringProperty(
+                    student.getUser() != null ? student.getUser().getUser_id() : "N/A"
+            );
+        });
     }
+
 
     @FXML
     void btnAddOnAction(ActionEvent event) throws Exception {
-    try {
-        String UserID = String.valueOf(cmbUser.getValue());
-        String S_id = lblStudentID.getText();
-        String S_Name = txtName.getText();
-        String Email = txtEmail.getText();
-        String phone = txtPhoneNumber.getText();
-        String Address = txtAddress.getText();
+        try {
+            String UserID = String.valueOf(cmbUser.getValue());
+            String S_id = lblStudentID.getText();
+            String S_Name = txtName.getText();
+            String Email = txtEmail.getText();
+            String phone = txtPhoneNumber.getText();
+            String Address = txtAddress.getText();
 
-        User user = userBO.searchByIdUser(UserID);
-        UserDTO userDTO = new UserDTO(user.getUser_id(),user.getUsername(),user.getAddress(),user.getUser_phone(),user.getUser_email(),user.getPosition(),user.getPassword());
+            User user = userBO.searchByIdUser(UserID);
+            UserDTO userDTO = new UserDTO(user.getUser_id(),user.getUsername(),user.getAddress(),user.getUser_phone(),user.getUser_email(),user.getPosition(),user.getPassword());
 
 
-        StudentDTO studentDTO = new StudentDTO(S_id,S_Name,phone,Email,Address,userDTO);
-        boolean isSave = studentBO.save(studentDTO);
+            StudentDTO studentDTO = new StudentDTO(S_id,S_Name,phone,Email,Address,userDTO);
 
-        if (isSave){
-            new Alert(Alert.AlertType.CONFIRMATION, "User saved successfully!").show();
-            clear();
-            loadAll();
-            generateNextId();
+            if(isValied()){
+                boolean isSave = studentBO.save(studentDTO);
 
-        } else {
-            new Alert(Alert.AlertType.ERROR, "User not saved successfully!").show();
+                if (isSave){
+                    new Alert(Alert.AlertType.CONFIRMATION, "User saved successfully!").show();
+                    clear();
+                    loadAll();
+                    generateNextId();
+
+                }
+            }
+            else {
+                new Alert(Alert.AlertType.ERROR, "User not saved successfully!").show();
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-    
-    } catch (Exception e) {
-        throw new RuntimeException(e);
-    }
     }
 
     private void clear() throws SQLException, ClassNotFoundException {
@@ -207,12 +255,12 @@ colUserID.setCellValueFactory(new PropertyValueFactory<>("user"));
 
     @FXML
     void btnClearOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
-clear();
+        clear();
     }
 
     @FXML
     void btnDeleteOnAction(ActionEvent event) {
-  String S_id = lblStudentID.getText();
+        String S_id = lblStudentID.getText();
         try {
             boolean isDeleted = studentBO.delete(S_id);
             if (isDeleted) {
@@ -242,15 +290,19 @@ clear();
 
 
             StudentDTO studentDTO = new StudentDTO(S_id,S_Name,phone,Email,Address,userDTO);
-            boolean isSave = studentBO.update(studentDTO);
 
-            if (isSave){
-                new Alert(Alert.AlertType.CONFIRMATION, "User update successfully!").show();
-                clear();
-                loadAll();
-                generateNextId();
+            if (isValied()){
+                boolean isSave = studentBO.update(studentDTO);
 
-            } else {
+                if (isSave){
+                    new Alert(Alert.AlertType.CONFIRMATION, "User update successfully!").show();
+                    clear();
+                    loadAll();
+                    generateNextId();
+
+                }
+            }
+            else {
                 new Alert(Alert.AlertType.ERROR, "Student not update successfully!").show();
             }
 
@@ -277,4 +329,37 @@ clear();
             throw new RuntimeException(e);
         }
     }
+
+
+    public boolean isValied(){
+        if (!Regex.setTextColor(org.example.util.Regex.TextField.NAME,txtName)) return false;
+        if (!Regex.setTextColor(org.example.util.Regex.TextField.ADDRESS,txtAddress)) return false;
+        if (!Regex.setTextColor(org.example.util.Regex.TextField.EMAIL,txtEmail)) return false;
+        if (!Regex.setTextColor(org.example.util.Regex.TextField.CONTACT,txtPhoneNumber)) return false;
+
+        return true;
+    }
+
+    @FXML
+    void Address(KeyEvent event) {
+        Regex.setTextColor(org.example.util.Regex.TextField.ADDRESS,txtAddress);
+
+    }
+
+    @FXML
+    void Email(KeyEvent event) {
+        Regex.setTextColor(org.example.util.Regex.TextField.EMAIL,txtEmail);
+
+    }
+
+    @FXML
+    void Name(KeyEvent event) {
+        Regex.setTextColor(org.example.util.Regex.TextField.NAME,txtName);
+    }
+
+    @FXML
+    void Phone(KeyEvent event) {
+        Regex.setTextColor(org.example.util.Regex.TextField.CONTACT,txtPhoneNumber);
+    }
+
 }

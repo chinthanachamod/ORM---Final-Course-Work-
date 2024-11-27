@@ -9,10 +9,18 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import org.example.BO.BOFactory;
 import org.example.BO.CourseBO;
+import org.example.BO.Impl.UserBOImpl;
+import org.example.BO.UserBO;
+import org.example.DAO.DAOFactory;
+import org.example.DAO.Impl.LoginDAO;
 import org.example.DTO.CourseDTO;
+import org.example.Entity.Login;
+import org.example.Entity.User;
+import org.example.util.Regex.Regex;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -62,11 +70,14 @@ public class CourseController {
     private TextField txtProgramName;
 
     CourseBO courseBO = (CourseBO) BOFactory.getBoFactory().getBo(BOFactory.BoType.Course);
+    UserBO userBO = (UserBOImpl) BOFactory.getBoFactory().getBo(BOFactory.BoType.User);
+    LoginDAO loginDAO = (LoginDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DaoType.Login);
 
     public void initialize() throws SQLException, ClassNotFoundException {
         setCellValueFactory();
         loadAll();
         generateNextId();
+        lastLoginID();
 
 
         tblCourse.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -78,6 +89,34 @@ public class CourseController {
 
             }
         });
+    }
+
+    /*login table eke log una last kenage user id ek aragannw*/
+    private void lastLoginID() throws SQLException, ClassNotFoundException {
+        Login login = loginDAO.getLastLogin();
+        UserID(login.getUserID());
+
+    }
+    /*Access denn security ekak danamw*/
+    public void UserID(String ID) throws SQLException, ClassNotFoundException {
+        String UserID = ID;
+        User user = userBO.searchByIdUser(UserID);
+        String position = user.getPosition();
+
+        if (position.equals("Admin")) {
+            btnBack.setDisable(false);
+            btnClear.setDisable(false);
+            btnAdd.setDisable(true);
+            btnUpdate.setDisable(true);
+            btnDelete.setDisable(true);
+
+        } else if (position.equals("Admissions Coordinator")) {
+            btnAdd.setDisable(false);
+            btnUpdate.setDisable(false);
+            btnDelete.setDisable(false);
+            btnBack.setDisable(false);
+            btnClear.setDisable(false);
+        }
     }
 
     private void setCellValueFactory() {
@@ -120,13 +159,17 @@ public class CourseController {
         double C_FEE = Double.parseDouble(txtCourseFee.getText());
 
         CourseDTO courseDTO = new CourseDTO(C_ID,C_NAME,C_Duration,C_FEE);
-        boolean isSave = courseBO.save(courseDTO);
 
-        if (isSave) {
-            new Alert(Alert.AlertType.CONFIRMATION, "Course saved successfully!").show();
-            clear();
-            loadAll();
-        }else{
+        if (isValied()){
+            boolean isSave = courseBO.save(courseDTO);
+
+            if (isSave) {
+                new Alert(Alert.AlertType.CONFIRMATION, "Course saved successfully!").show();
+                clear();
+                loadAll();
+            }
+        }
+        else{
             new Alert(Alert.AlertType.ERROR, "Course not saved successfully!").show();
         }
 
@@ -189,13 +232,16 @@ public class CourseController {
             double C_FEE = Double.parseDouble(txtCourseFee.getText());
 
             CourseDTO courseDTO = new CourseDTO(C_ID,C_NAME,C_Duration,C_FEE);
-            boolean isSave = courseBO.update(courseDTO);
 
-            if (isSave) {
-                new Alert(Alert.AlertType.CONFIRMATION, "Course Update successfully!").show();
-                clear();
-                loadAll();
-            }else{
+            if (isValied()){boolean isSave = courseBO.update(courseDTO);
+
+                if (isSave) {
+                    new Alert(Alert.AlertType.CONFIRMATION, "Course Update successfully!").show();
+                    clear();
+                    loadAll();
+                }
+            }
+            else{
                 new Alert(Alert.AlertType.ERROR, "Course not Update successfully!").show();
             }
 
@@ -208,5 +254,26 @@ public class CourseController {
         lblCourseID.setText(code);
     }
 
+    public boolean isValied(){
+        if (!Regex.setTextColor(org.example.util.Regex.TextField.NAME,txtProgramName)) return false;
+        if (!Regex.setTextColor(org.example.util.Regex.TextField.NUMBER,txtCourseFee)) return false;
+
+        return true;
+    }
+
+    @FXML
+    void Course_Fee(KeyEvent event) {
+        Regex.setTextColor(org.example.util.Regex.TextField.NUMBER,txtCourseFee);
+    }
+
+    @FXML
+    void Duration(KeyEvent event) {
+
+    }
+
+    @FXML
+    void Programme_Name(KeyEvent event) {
+        Regex.setTextColor(org.example.util.Regex.TextField.NAME,txtProgramName);
+    }
 
 }

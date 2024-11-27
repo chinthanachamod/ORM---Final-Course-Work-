@@ -19,7 +19,7 @@ public class UserDAOImpl implements UserDAO {
         tx.commit();
         session.close();
         return true;
-        }
+    }
 
     @Override
     public boolean update(User entity) throws Exception {

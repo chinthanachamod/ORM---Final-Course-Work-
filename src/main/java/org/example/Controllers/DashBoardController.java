@@ -6,10 +6,17 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import org.example.DAO.DAOFactory;
+import org.example.DAO.Impl.LoginDAO;
+import org.example.Entity.Login;
+
+import java.sql.SQLException;
 
 public class DashBoardController {
 
+    public Label LblUserID;
     @FXML
     private Button btnCourse;
     @FXML
@@ -23,9 +30,18 @@ public class DashBoardController {
     @FXML
     private Button btnUsers;
 
-    public void initialize(){
-
+    LoginDAO loginDAO = (LoginDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DaoType.Login);
+    public void initialize() throws SQLException, ClassNotFoundException {
+        lastLoginID();
     }
+
+    private void lastLoginID() {
+        Login login = loginDAO.getLastLogin();
+        System.out.println(login.getUserID());
+        LblUserID.setText(login.getUserID());
+    }
+
+
     @FXML
     void btnCourseOnAction(ActionEvent event) {
         try {
@@ -109,9 +125,4 @@ public class DashBoardController {
             e.printStackTrace();
         }
     }
-/*    public void setUserId(String userId) throws Exception {
-        StudentController studentController = new StudentController();
-        studentController.lblUserID(userId);
-    }*/
-
 }

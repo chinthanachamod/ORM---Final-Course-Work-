@@ -11,12 +11,12 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="546.0" prefWidth="1000.0" style="-fx-background-color: #E4C087;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Controllers.UserController">
+<AnchorPane prefHeight="546.0" prefWidth="1100.0" style="-fx-background-color: #E4C087;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Controllers.UserController">
 
     <!-- Header Label -->
-    <Label layoutX="509.0" layoutY="22.0" prefHeight="54.0" prefWidth="262.0" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="- User Management -">
+    <Label layoutX="509.0" layoutY="22.0" prefHeight="77.0" prefWidth="330.0" style="-fx-font-weight: bold;" text="- User Management -">
       <font>
-         <Font name="System Bold" size="34.0" />
+         <Font name="System Bold" size="32.0" />
       </font></Label>
 
     <!-- Back Button -->
@@ -93,14 +93,14 @@
       </font></Button>
 
     <!-- Table View for Displaying User Details (excluding Password) -->
-    <TableView fx:id="tblUsers" layoutX="295.0" layoutY="128.0" prefHeight="393.0" prefWidth="690.0">
+    <TableView fx:id="tblUsers" layoutX="300.0" layoutY="127.0" prefHeight="394.0" prefWidth="781.0">
         <columns>
-            <TableColumn fx:id="colUserID" prefWidth="75.0" text="User ID" />
-            <TableColumn fx:id="colName" prefWidth="100.0" text="Name" />
-            <TableColumn fx:id="colAddress" prefWidth="109.5999755859375" text="Address" />
-            <TableColumn fx:id="colPhone" prefWidth="128.79998779296875" text="Phone" />
-            <TableColumn fx:id="colEmail" prefWidth="144.7999267578125" text="Email" />
-            <TableColumn fx:id="colPosition" prefWidth="132.0001220703125" text="Position" />
+            <TableColumn fx:id="colUserID" prefWidth="96.800048828125" text="User ID" />
+            <TableColumn fx:id="colName" prefWidth="101.5999755859375" text="Name" />
+            <TableColumn fx:id="colAddress" prefWidth="126.4000244140625" text="Address" />
+            <TableColumn fx:id="colPhone" prefWidth="135.20001220703125" text="Phone" />
+            <TableColumn fx:id="colEmail" prefWidth="179.199951171875" text="Email" />
+            <TableColumn fx:id="colPosition" prefWidth="143.20013427734375" text="Position" />
         </columns>
     </TableView>
    <TextField fx:id="UserID" layoutX="120.0" layoutY="78.0" prefHeight="31.0" prefWidth="158.0" />
